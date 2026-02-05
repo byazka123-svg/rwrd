@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MenuItemCard from '../components/MenuItemCard';
 import ProductCard from '../components/ProductCard';
 import Slider from '../components/Slider';
 import RedrinkModal from '../components/RedrinkModal';
+import SectionTitle from '../components/SectionTitle';
 
 interface Product {
     name: string;
@@ -100,63 +101,10 @@ const storeSlides = [
         url: 'https://ik.imagekit.io/hrctvvb3m/Gemini_Generated_Image_z46j1vz46j1vz46j.png?updatedAt=1721284534898',
         title: "Baru! Rempah Sachet Praktis",
         subtitle: "Nikmati racikan khas Re'ward kapan saja, di mana saja. Ciptakan minuman sehatmu sendiri di rumah."
-    },
-    {
-        url: 'https://picsum.photos/1200/800?image=223',
-        title: "Paket Sehat Re'drink Mingguan",
-        subtitle: "Mulai hari Anda dengan energi dan nutrisi terbaik. Pesan paket mingguan sekarang dan rasakan bedanya!"
     }
 ];
 
-const categories = [
-  {
-    id: '#store-redrink',
-    label: "Re'drink",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    id: '#store-merchandise',
-    label: 'Merchandise',
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-    ),
-  },
-  {
-    id: '#store-reward-to-go',
-    label: "Re'ward To Go",
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-    ),
-  },
-  {
-    id: '#store-herbal',
-    label: 'Produk Herbal',
-    icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m5 6v4m-2-2h4M19 3v4m-2-2h4" />
-        </svg>
-    )
-  },
-];
-
-type MerchSubTab = keyof typeof takeMeHomeData.merchandise;
-
-const merchSubTabs: { id: MerchSubTab, label: string }[] = [
-    { id: 'drinkware', label: 'Drinkware' },
-    { id: 'tasApparel', label: 'Tas & Apparel' },
-    { id: 'aksesoris', label: 'Aksesoris' },
-    { id: 'stationery', label: 'Stationery' },
-    { id: 'homeLiving', label: 'Home & Living' },
-];
+const formatSubCategoryLabel = (key: string) => key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 
 interface StorePageProps {
     onAddToCart: (item: Product) => void;
@@ -164,13 +112,67 @@ interface StorePageProps {
 }
 
 const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => {
-  const [visibleRedrink, setVisibleRedrink] = useState(4);
-  const [visibleMerchandise, setVisibleMerchandise] = useState(4);
-  const [visibleRewardToGo, setVisibleRewardToGo] = useState(4);
-  const [visibleHerbal, setVisibleHerbal] = useState(4);
-
-  const [activeMerchSubTab, setActiveMerchSubTab] = useState<MerchSubTab>('drinkware');
+  const [activeCategory, setActiveCategory] = useState('redrink');
+  const [activeMerchSubTab, setActiveMerchSubTab] = useState('drinkware');
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
+
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const subCategoryLinkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const mainTabs = [
+    { id: 'redrink', label: "Re'drink" },
+    { id: 'merchandise', label: 'Merchandise' },
+    { id: 'rewardToGo', label: "Re'ward To Go" },
+    { id: 'produkHerbal', label: 'Produk Herbal' },
+  ];
+
+  const merchSubTabs = Object.keys(takeMeHomeData.merchandise).map(key => ({
+    id: key,
+    label: formatSubCategoryLabel(key),
+  }));
+
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            const [type, category, subCategory] = id.split('-');
+            
+            if (type === 'category') {
+               setActiveCategory(category);
+            } else if (type === 'subcategory') {
+               setActiveCategory(category);
+               setActiveMerchSubTab(subCategory);
+            }
+          }
+        });
+      },
+      { rootMargin: `-180px 0px -65% 0px`, threshold: 0 }
+    );
+
+    const currentRefs = sectionRefs.current;
+    Object.keys(currentRefs).forEach((key) => {
+      const ref = currentRefs[key];
+      if (ref) observerRef.current?.observe(ref);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const activeLink = subCategoryLinkRefs.current[activeMerchSubTab];
+    if (activeLink) {
+        activeLink.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+        });
+    }
+  }, [activeMerchSubTab]);
 
   const handleOpenModal = (product: Product) => {
     if (product.packages) {
@@ -183,18 +185,24 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
   const handleCloseModal = () => {
     setModalProduct(null);
   };
-
-  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  
+  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, categoryId: string) => {
     e.preventDefault();
-    const id = targetId.substring(1); // remove '#'
-    const element = document.getElementById(id);
+    setActiveCategory(categoryId);
+    const element = document.getElementById(`category-${categoryId}`);
     if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-
-  const currentMerchItems = takeMeHomeData.merchandise[activeMerchSubTab];
+  const handleSubCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, subCategoryId: string) => {
+      e.preventDefault();
+      setActiveMerchSubTab(subCategoryId);
+      const element = document.getElementById(`subcategory-merchandise-${subCategoryId}`);
+      if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+      }
+  };
 
   return (
     <main>
@@ -205,117 +213,90 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
         onClose={handleCloseModal}
         onAddToCart={onAddToCart}
       />
-
-      <section id="store-page" className="py-12 bg-brand-offwhite">
-        <div className="container mx-auto px-6">
-          {/* Category Navigation */}
-          <div className="mb-12">
-            <div className="flex flex-wrap items-center justify-center gap-3">
-                {categories.map((category) => (
-                <a 
-                    key={category.id} 
-                    href={category.id}
-                    onClick={(e) => handleCategoryClick(e, category.id)}
-                    className="flex-shrink-0 flex flex-row items-center justify-center text-center px-5 py-2 bg-white rounded-full shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
-                >
-                    {category.icon}
-                    <span className="ml-2 text-sm font-bold text-brand-green group-hover:text-brand-orange transition-colors duration-300">{category.label}</span>
-                </a>
+      
+      <div className="sticky top-20 z-30 bg-white shadow-md">
+        <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto bg-white">
+          {mainTabs.map(tab => (
+            <a
+              href={`#category-${tab.id}`}
+              key={tab.id}
+              onClick={(e) => handleCategoryClick(e, tab.id)}
+              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+                activeCategory === tab.id
+                  ? 'text-brand-orange border-b-2 border-brand-orange'
+                  : 'text-brand-brown hover:text-brand-orange'
+              }`}
+            >
+              {tab.label}
+            </a>
+          ))}
+        </div>
+        
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${activeCategory === 'merchandise' ? 'max-h-40' : 'max-h-0'}`}>
+            <div className="flex overflow-x-auto gap-2 p-3 hide-scrollbar bg-white/95 backdrop-blur-sm">
+                {merchSubTabs.map(tab => (
+                  <a
+                    href={`#subcategory-merchandise-${tab.id}`}
+                    key={tab.id}
+                    ref={el => subCategoryLinkRefs.current[tab.id] = el}
+                    onClick={(e) => handleSubCategoryClick(e, tab.id)}
+                    className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                    activeMerchSubTab === tab.id
+                      ? 'bg-brand-green text-white shadow'
+                      : 'bg-brand-offwhite text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
+                    }`}
+                  >
+                    {tab.label}
+                  </a>
                 ))}
             </div>
-          </div>
-          
-          {/* Re'drink Section */}
-          <div id="store-redrink" className="py-16 border-t border-brand-orange/30 scroll-mt-24">
-            <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Paket Sehat Re'drink</h3>
+        </div>
+      </div>
+
+      <section id="full-store-content" className="bg-white">
+        <div className="container mx-auto px-6">
+          <div id="category-redrink" ref={el => sectionRefs.current['category-redrink'] = el} className="pt-8">
+            <SectionTitle title="Re'drink" subtitle="Paket Sehat Harian" />
             <div className="grid grid-cols-2 gap-6">
-              {fullJsrData.slice(0, visibleRedrink).map((item, index) => (
+              {fullJsrData.map((item, index) => (
                   <MenuItemCard key={`redrink-${index}`} {...item} onAddToCart={handleOpenModal} onCardClick={handleOpenModal} />
               ))}
             </div>
-            {visibleRedrink < fullJsrData.length && (
-              <div className="text-center mt-12">
-                  <button 
-                    onClick={() => setVisibleRedrink(fullJsrData.length)}
-                    className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
-                    Tampilkan Lebih Banyak Produk
-                  </button>
-              </div>
-            )}
           </div>
-
-          {/* Merchandise Section */}
-          <div id="store-merchandise" className="py-16 border-t border-brand-orange/30 scroll-mt-24">
-            <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Merchandise</h3>
-             <div className="flex flex-wrap justify-center gap-2 mb-10">
-                {merchSubTabs.map(tab => (
-                   <button
-                     key={tab.id}
-                     onClick={() => setActiveMerchSubTab(tab.id)}
-                     className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
-                       activeMerchSubTab === tab.id
-                         ? 'bg-brand-green text-white shadow'
-                         : 'bg-white text-brand-brown hover:bg-brand-orange/20'
-                     }`}
-                   >
-                     {tab.label}
-                   </button>
-                ))}
-            </div>
+          
+          <div id="category-merchandise" ref={el => sectionRefs.current['category-merchandise'] = el} className="pt-16">
+            <SectionTitle title="Merchandise" subtitle="Gaya Hidup Sehat" />
+            {Object.entries(takeMeHomeData.merchandise).map(([subCategory, items]) => (
+              <div key={subCategory} id={`subcategory-merchandise-${subCategory}`} ref={el => sectionRefs.current[`subcategory-merchandise-${subCategory}`] = el} className="mb-12">
+                <h3 className="text-2xl font-bold font-serif text-brand-green mb-6 border-l-4 border-brand-orange pl-4">
+                  {formatSubCategoryLabel(subCategory)}
+                </h3>
+                <div className="grid grid-cols-2 gap-6">
+                  {items.map((item, index) => (
+                    <ProductCard key={`merch-${subCategory}-${index}`} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div id="category-rewardToGo" ref={el => sectionRefs.current['category-rewardToGo'] = el} className="pt-8">
+            <SectionTitle title="Re'ward To Go" subtitle="Kebaikan Instan" />
             <div className="grid grid-cols-2 gap-6">
-              {currentMerchItems.slice(0, visibleMerchandise).map((product, index) => (
-                <ProductCard key={`merch-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
+              {takeMeHomeData.rewardToGo.map((item, index) => (
+                <ProductCard key={`togo-${index}`} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
               ))}
             </div>
-            {visibleMerchandise < currentMerchItems.length && (
-              <div className="text-center mt-12">
-                  <button 
-                    onClick={() => setVisibleMerchandise(currentMerchItems.length)}
-                    className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
-                    Tampilkan Lebih Banyak Produk
-                  </button>
-              </div>
-            )}
           </div>
 
-           {/* Product Innovation Section */}
-          <div id="store-reward-to-go" className="py-16 border-t border-brand-orange/30 scroll-mt-24">
-            <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Re'ward To Go</h3>
+          <div id="category-produkHerbal" ref={el => sectionRefs.current['category-produkHerbal'] = el} className="pt-16 pb-12">
+            <SectionTitle title="Produk Herbal" subtitle="Solusi Alami" />
             <div className="grid grid-cols-2 gap-6">
-              {takeMeHomeData.rewardToGo.slice(0, visibleRewardToGo).map((product, index) => (
-                <ProductCard key={`promo-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
+              {takeMeHomeData.produkHerbal.map((item, index) => (
+                <ProductCard key={`herbal-${index}`} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
               ))}
             </div>
-            {visibleRewardToGo < takeMeHomeData.rewardToGo.length && (
-              <div className="text-center mt-12">
-                  <button
-                    onClick={() => setVisibleRewardToGo(takeMeHomeData.rewardToGo.length)}
-                    className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
-                    Tampilkan Lebih Banyak Produk
-                  </button>
-              </div>
-            )}
           </div>
-
-           {/* Herbal Products Section */}
-          <div id="store-herbal" className="py-16 border-t border-b border-brand-orange/30 scroll-mt-24">
-            <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Produk Herbal</h3>
-            <div className="grid grid-cols-2 gap-6">
-              {takeMeHomeData.produkHerbal.slice(0, visibleHerbal).map((product, index) => (
-                <ProductCard key={`herbal-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
-              ))}
-            </div>
-            {visibleHerbal < takeMeHomeData.produkHerbal.length && (
-              <div className="text-center mt-12">
-                  <button
-                    onClick={() => setVisibleHerbal(takeMeHomeData.produkHerbal.length)}
-                    className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
-                    Tampilkan Lebih Banyak Produk
-                  </button>
-              </div>
-            )}
-          </div>
-
         </div>
       </section>
     </main>
