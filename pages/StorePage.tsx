@@ -72,7 +72,7 @@ const takeMeHomeData = {
         { name: 'Wellness Journal', description: 'A beautifully designed journal to track your wellness journey.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(5).jpg', price: 'Rp 95.000' },
     ],
     homeLiving: [
-        { name: 'Scented Soy Candle', description: 'Relaxing scented candle made from natural soy wax.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(4).jpg', price: 'Rp 115.000' },
+        { name: 'Scented Soy Candle', description: 'Relaxing scented candle made from natural soy wax.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%2_20(4).jpg', price: 'Rp 115.000' },
     ]
   },
   rewardToGo: [
@@ -183,6 +183,15 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
     setModalProduct(null);
   };
 
+  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const id = targetId.substring(1); // remove '#'
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
 
   const currentMerchItems = takeMeHomeData.merchandise[activeMerchSubTab];
 
@@ -205,6 +214,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
                 <a 
                     key={category.id} 
                     href={category.id}
+                    onClick={(e) => handleCategoryClick(e, category.id)}
                     className="flex-shrink-0 flex flex-row items-center justify-center text-center px-5 py-2 bg-white rounded-full shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
                 >
                     {category.icon}

@@ -72,7 +72,7 @@ const JsrDrinks: React.FC<JsrDrinksProps> = ({ onAddToCart }) => {
             Minuman fungsional harian yang diformulasikan secara khusus oleh Dr. Zaidul Akbar untuk mendukung kesehatan dan vitalitas Anda. Setiap paket dirancang untuk tujuan spesifik, menemani perjalanan sehat Anda setiap hari.
           </p>
           <div className="grid grid-cols-2 gap-6">
-              {jsrData.map((item, index) => (
+              {jsrData.slice(0, 2).map((item, index) => (
                   <MenuItemCard key={index} {...item} onAddToCart={handleOpenModal} />
               ))}
           </div>

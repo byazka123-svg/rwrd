@@ -7,7 +7,21 @@ import Services from './Services';
 
 type Tab = 'menu' | 'retail' | 'b2b';
 
-const Offerings: React.FC = () => {
+// FIX: Define props for the Offerings component to accept the onAddToCart function
+// and a compatible Product type to pass down to child components.
+interface Product {
+    name: string;
+    description: string;
+    image: string;
+    price?: string;
+    packages?: { [key: string]: string };
+}
+
+interface OfferingsProps {
+    onAddToCart: (item: Product) => void;
+}
+
+const Offerings: React.FC<OfferingsProps> = ({ onAddToCart }) => {
   const [activeTab, setActiveTab] = useState<Tab>('menu');
 
   const tabs: { id: Tab; label: string }[] = [
@@ -19,9 +33,11 @@ const Offerings: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'menu':
-        return <Menu />;
+        // FIX: Pass onAddToCart prop to Menu component to satisfy its required props.
+        return <Menu onAddToCart={onAddToCart} />;
       case 'retail':
-        return <Products />;
+        // FIX: Pass onAddToCart prop to Products component to satisfy its required props.
+        return <Products onAddToCart={onAddToCart} />;
       case 'b2b':
         return <Services />;
       default:
