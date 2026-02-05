@@ -15,11 +15,11 @@ const About: React.FC = () => {
         {/* Custom SectionTitle for inverted colors */}
         <div className="text-center mb-12">
           <h3 className="text-base text-brand-orange font-bold tracking-wider uppercase">Welcome to Re'ward</h3>
-          <h2 className="text-4xl md:text-5xl font-bold font-serif text-brand-offwhite mt-2" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>Our Philosophy</h2>
+          <h2 className="text-3xl md:text-4xl font-bold font-serif text-brand-offwhite mt-2" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>Our Philosophy</h2>
         </div>
         
         <div className="max-w-3xl mx-auto text-center">
-          <div className="text-lg text-brand-offwhite leading-relaxed" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>
+          <div className="text-base text-brand-offwhite leading-relaxed" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>
             <p className="mb-4">
               Di <span className="font-bold">Re'ward by Dr. Zaidul Akbar</span>, kami membangun brand di atas fondasi Thibbun Nabawi (Kesehatan Islam) yang ilmiah, memadukan kearifan lokal dengan ilmu kedokteran modern.
             </p>

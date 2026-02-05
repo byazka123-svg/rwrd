@@ -79,43 +79,35 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
     <section id="products" className="py-20 bg-white overflow-hidden">
       <div className="container mx-auto px-6">
         <SectionTitle subtitle="Retail & Ecosystem" title="Take Me Home" />
-        <p className="text-center max-w-3xl mx-auto -mt-8 mb-12 text-lg text-brand-brown">
+        <p className="text-center max-w-3xl mx-auto -mt-8 mb-12 text-base text-brand-brown">
             Bawa pulang kebaikan Re'ward. Temukan produk-produk inovatif, merchandise, dan produk herbal pilihan untuk menemani gaya hidup sehat Anda.
         </p>
-        <div className="flex flex-col items-center gap-12">
-            {/* Image Column */}
-            <div className="w-full">
-                <img src="https://ik.imagekit.io/hrctvvb3m/Screenshot%202026-02-05%20at%2008.10.48.png" alt="Re'ward Retail Products" className="rounded-lg shadow-2xl w-full h-auto object-cover" style={{aspectRatio: '4/3'}}/>
+        <div className="w-full">
+            <div className="flex justify-center mb-8 border-b border-brand-orange/30">
+            {subTabs.map(tab => (
+                <button
+                    key={tab.id}
+                    onClick={() => setActiveSubTab(tab.id)}
+                    className={`px-5 py-2 text-md font-medium transition-colors duration-300 ${
+                    activeSubTab === tab.id
+                        ? 'text-brand-orange border-b-2 border-brand-orange'
+                        : 'text-brand-brown hover:text-brand-orange'
+                    }`}
+                >
+                    {tab.label}
+                </button>
+            ))}
             </div>
-
-            {/* Content Column */}
-            <div className="w-full">
-                <div className="flex justify-center mb-8 border-b border-brand-orange/30">
-                {subTabs.map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveSubTab(tab.id)}
-                        className={`px-5 py-2 text-md font-medium transition-colors duration-300 ${
-                        activeSubTab === tab.id
-                            ? 'text-brand-orange border-b-2 border-brand-orange'
-                            : 'text-brand-brown hover:text-brand-orange'
-                        }`}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                {displayedItems.map((product, index) => (
-                    <ProductCard key={index} {...product} onAddToCart={onAddToCart} />
-                ))}
-                </div>
-                
-                <div className="text-center mt-12">
-                    <a href="#store" onClick={handleViewMoreClick} className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
-                    Lihat Lebih Lengkap
-                    </a>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+            {displayedItems.map((product, index) => (
+                <ProductCard key={index} {...product} onAddToCart={onAddToCart} />
+            ))}
+            </div>
+            
+            <div className="text-center mt-12">
+                <a href="#store" onClick={handleViewMoreClick} className="border-2 border-brand-orange text-brand-orange font-bold py-2 px-6 rounded-full hover:bg-brand-orange hover:text-white transition-colors">
+                Lihat Lebih Lengkap
+                </a>
             </div>
         </div>
       </div>

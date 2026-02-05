@@ -68,7 +68,7 @@ const JsrDrinks: React.FC<JsrDrinksProps> = ({ onAddToCart }) => {
       <section id="jsr-drinks" className="py-20 md:py-32 bg-brand-offwhite overflow-hidden">
         <div className="container mx-auto px-6">
           <SectionTitle subtitle="Signature Health Drinks" title="Re'drink" />
-          <p className="text-center max-w-3xl mx-auto -mt-8 mb-12 text-lg text-brand-brown">
+          <p className="text-center max-w-3xl mx-auto -mt-8 mb-12 text-base text-brand-brown">
             Minuman fungsional harian yang diformulasikan secara khusus oleh Dr. Zaidul Akbar untuk mendukung kesehatan dan vitalitas Anda. Setiap paket dirancang untuk tujuan spesifik, menemani perjalanan sehat Anda setiap hari.
           </p>
           <div className="grid grid-cols-2 gap-6">
