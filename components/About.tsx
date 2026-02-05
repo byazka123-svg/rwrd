@@ -5,7 +5,7 @@ const About: React.FC = () => {
   return (
     <section 
       id="about" 
-      className="relative py-20 md:py-32 bg-cover bg-center bg-fixed" 
+      className="relative py-20 md:py-32 bg-cover bg-center" 
       style={{ backgroundImage: "url('https://ik.imagekit.io/hrctvvb3m/Untitled%20design%20(12).png')" }}
     >
       {/* Overlay for readability */}
