@@ -111,42 +111,44 @@ const MenuPage: React.FC<MenuPageProps> = ({ onAddToCart, onViewDetails }) => {
         <section id="full-menu" className="py-12 bg-white">
         <div className="container mx-auto px-6">
             <SectionTitle title="Our Full Menu" subtitle="Taste The Goodness" />
-            <div className="flex justify-center mb-10 border-b border-brand-orange/30 overflow-x-auto">
-            {subTabs.map(tab => (
-                <button
-                key={tab.id}
-                onClick={() => setActiveSubTab(tab.id)}
-                className={`px-5 py-2 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
-                    activeSubTab === tab.id
-                    ? 'text-brand-orange border-b-2 border-brand-orange'
-                    : 'text-brand-brown hover:text-brand-orange'
-                }`}
-                >
-                {tab.label}
-                </button>
-            ))}
-            </div>
-            {activeSubTab === 'minuman' && (
-              <div className="flex overflow-x-auto gap-2 mb-10 hide-scrollbar pb-4 -mx-6 px-6">
-                  {minumanSubTabs.map(tab => (
+            <div className="sticky top-20 z-30 bg-white pt-4 pb-2 -mx-6 px-6 shadow-sm">
+              <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto">
+                {subTabs.map(tab => (
                     <button
-                        key={tab.id}
-                        onClick={() => setActiveMinumanSubTab(tab.id)}
-                        className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
-                        activeMinumanSubTab === tab.id
-                            ? 'bg-brand-green text-white shadow'
-                            : 'bg-white text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
-                        }`}
+                    key={tab.id}
+                    onClick={() => setActiveSubTab(tab.id)}
+                    className={`px-5 py-2 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+                        activeSubTab === tab.id
+                        ? 'text-brand-orange border-b-2 border-brand-orange'
+                        : 'text-brand-brown hover:text-brand-orange'
+                    }`}
                     >
-                        {tab.label}
+                    {tab.label}
                     </button>
-                  ))}
+                ))}
               </div>
-            )}
-            <div className="grid grid-cols-2 gap-6">
-            {currentItems.map((item, index) => (
-                <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
-            ))}
+              {activeSubTab === 'minuman' && (
+                <div className="flex overflow-x-auto gap-2 mt-4 hide-scrollbar pb-2">
+                    {minumanSubTabs.map(tab => (
+                      <button
+                          key={tab.id}
+                          onClick={() => setActiveMinumanSubTab(tab.id)}
+                          className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                          activeMinumanSubTab === tab.id
+                              ? 'bg-brand-green text-white shadow'
+                              : 'bg-white text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
+                          }`}
+                      >
+                          {tab.label}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-6 pt-10">
+              {currentItems.map((item, index) => (
+                  <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
+              ))}
             </div>
         </div>
         </section>

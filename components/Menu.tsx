@@ -50,7 +50,6 @@ const menuData = {
 };
 
 type SubTab = 'minuman' | 'makanan' | 'dessert';
-type MinumanSubTab = keyof typeof menuData.minuman;
 
 interface Product {
     name: string;
@@ -66,21 +65,11 @@ interface MenuProps {
 
 const Menu: React.FC<MenuProps> = ({ onAddToCart, onViewDetails }) => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('minuman');
-  const [activeMinumanSubTab, setActiveMinumanSubTab] = useState<MinumanSubTab>('signatureSeries');
   
   const subTabs: { id: SubTab, label: string }[] = [
     { id: 'minuman', label: 'Minuman' },
     { id: 'makanan', label: 'Makanan' },
     { id: 'dessert', label: 'Dessert/Snack' },
-  ];
-
-  const minumanSubTabs: { id: MinumanSubTab, label: string }[] = [
-    { id: 'signatureSeries', label: 'Signature' },
-    { id: 'healingSeries', label: 'Healing' },
-    { id: 'womenWellness', label: 'Women Wellness' },
-    { id: 'menWellness', label: 'Men Wellness' },
-    { id: 'refreshSeries', label: 'Re’fresh' },
-    { id: 'selfRewardSpecials', label: 'Self Reward' },
   ];
   
   const currentItems = activeSubTab === 'minuman' 
@@ -102,38 +91,24 @@ const Menu: React.FC<MenuProps> = ({ onAddToCart, onViewDetails }) => {
             Nikmati hidangan dan minuman sehat yang dibuat dari bahan-bahan alami terbaik, diracik untuk menenangkan jiwa dan raga Anda.
         </p>
         <div className="w-full">
-          <div className="flex justify-center mb-8 border-b border-brand-orange/30 overflow-x-auto">
-            {subTabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSubTab(tab.id)}
-                className={`px-5 py-2 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
-                  activeSubTab === tab.id
-                    ? 'text-brand-orange border-b-2 border-brand-orange'
-                    : 'text-brand-brown hover:text-brand-orange'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          {activeSubTab === 'minuman' && (
-            <div className="flex overflow-x-auto gap-2 mb-8 hide-scrollbar pb-2 -mx-6 px-6">
-              {minumanSubTabs.map(tab => (
-                 <button
-                   key={tab.id}
-                   onClick={() => {
-                       setActiveMinumanSubTab(tab.id);
-                       window.location.hash = '#fnb-menu'; 
-                   }}
-                   className="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-300 bg-white text-brand-brown hover:bg-brand-orange/20 shadow-sm border border-brand-orange/20 flex-shrink-0"
-                 >
-                   {tab.label}
-                 </button>
+          <div className="sticky top-20 z-30 bg-white pt-4 pb-2 -mx-6 px-6 shadow-sm">
+            <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto">
+              {subTabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSubTab(tab.id)}
+                  className={`px-5 py-2 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+                    activeSubTab === tab.id
+                      ? 'text-brand-orange border-b-2 border-brand-orange'
+                      : 'text-brand-brown hover:text-brand-orange'
+                  }`}
+                >
+                  {tab.label}
+                </button>
               ))}
             </div>
-          )}
-          <div className="grid grid-cols-2 gap-4">
+          </div>
+          <div className="grid grid-cols-2 gap-4 pt-8">
             {displayedItems.map((item, index) => (
               <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
             ))}
