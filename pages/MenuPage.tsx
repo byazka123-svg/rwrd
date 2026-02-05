@@ -87,10 +87,16 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
 
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const subCategoryLinkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Effect for scrollspy
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    // We disconnect the observer on re-renders to avoid observing stale elements
+    if (observerRef.current) {
+        observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -112,21 +118,18 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
       }
     );
 
-    // FIX: Changed from Object.values to Object.keys to iterate over the refs.
-    // This resolves a TypeScript error where the ref was incorrectly inferred as 'unknown',
-    // making it unassignable to the 'Element' parameter of 'observer.observe'.
     const currentRefs = sectionRefs.current;
     Object.keys(currentRefs).forEach((key) => {
       const ref = currentRefs[key];
       if (ref) {
-        observer.observe(ref);
+        observerRef.current?.observe(ref);
       }
     });
 
     return () => {
-      observer.disconnect();
+        observerRef.current?.disconnect();
     };
-  }, []);
+  }, []); // Rerunning this effect isn't necessary on state changes
 
   // Effect for auto-scrolling sub-category navigation
   useEffect(() => {
@@ -139,6 +142,24 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
         });
     }
   }, [activeMinumanSubTab]);
+  
+  const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, categoryId: string) => {
+    e.preventDefault();
+    setActiveCategory(categoryId);
+    const element = document.getElementById(`category-${categoryId}`);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleSubCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, subCategoryId: string) => {
+      e.preventDefault();
+      setActiveMinumanSubTab(subCategoryId);
+      const element = document.getElementById(`subcategory-minuman-${subCategoryId}`);
+      if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+      }
+  };
 
   const subTabs = Object.keys(menuData).map(key => ({
     id: key,
@@ -160,6 +181,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
             <a
               href={`#category-${tab.id}`}
               key={tab.id}
+              onClick={(e) => handleCategoryClick(e, tab.id)}
               className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
                 activeCategory === tab.id
                   ? 'text-brand-orange border-b-2 border-brand-orange'
@@ -178,6 +200,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
                     href={`#subcategory-minuman-${tab.id}`}
                     key={tab.id}
                     ref={el => subCategoryLinkRefs.current[tab.id] = el}
+                    onClick={(e) => handleSubCategoryClick(e, tab.id)}
                     className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
                     activeMinumanSubTab === tab.id
                       ? 'bg-brand-green text-white shadow'
