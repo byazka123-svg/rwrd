@@ -58,7 +58,7 @@ const fullJsrData = [
 const takeMeHomeData = {
   merchandise: {
     drinkware: [
-        { name: "Re'ward Signature Mug", description: 'An elegant ceramic mug featuring our logo.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(9).jpg', price: 'Rp 125.000' },
+        { name: "Re'ward Signature Mug", description: 'An elegant ceramic mug featuring our logo. Perfect for your daily ritual.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(9).jpg', price: 'Rp 125.000' },
         { name: "Glass Tumbler with Bamboo Lid", description: 'Eco-friendly glass tumbler for your hot or cold beverages.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(10).jpg', price: 'Rp 145.000' },
     ],
     tasApparel: [
@@ -72,7 +72,7 @@ const takeMeHomeData = {
         { name: 'Wellness Journal', description: 'A beautifully designed journal to track your wellness journey.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(5).jpg', price: 'Rp 95.000' },
     ],
     homeLiving: [
-        { name: 'Scented Soy Candle', description: 'Relaxing scented candle made from natural soy wax.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%2_20(4).jpg', price: 'Rp 115.000' },
+        { name: 'Scented Soy Candle', description: 'Relaxing scented candle made from natural soy wax.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(4).jpg', price: 'Rp 115.000' },
     ]
   },
   rewardToGo: [
@@ -160,9 +160,10 @@ const merchSubTabs: { id: MerchSubTab, label: string }[] = [
 
 interface StorePageProps {
     onAddToCart: (item: Product) => void;
+    onViewDetails: (item: Product) => void;
 }
 
-const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
+const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => {
   const [visibleRedrink, setVisibleRedrink] = useState(4);
   const [visibleMerchandise, setVisibleMerchandise] = useState(4);
   const [visibleRewardToGo, setVisibleRewardToGo] = useState(4);
@@ -229,7 +230,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
             <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Paket Sehat Re'drink</h3>
             <div className="grid grid-cols-2 gap-6">
               {fullJsrData.slice(0, visibleRedrink).map((item, index) => (
-                  <MenuItemCard key={`redrink-${index}`} {...item} onAddToCart={handleOpenModal} />
+                  <MenuItemCard key={`redrink-${index}`} {...item} onAddToCart={handleOpenModal} onCardClick={handleOpenModal} />
               ))}
             </div>
             {visibleRedrink < fullJsrData.length && (
@@ -263,7 +264,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
             </div>
             <div className="grid grid-cols-2 gap-6">
               {currentMerchItems.slice(0, visibleMerchandise).map((product, index) => (
-                <ProductCard key={`merch-${index}`} {...product} onAddToCart={onAddToCart} />
+                <ProductCard key={`merch-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
               ))}
             </div>
             {visibleMerchandise < currentMerchItems.length && (
@@ -282,7 +283,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
             <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Re'ward To Go</h3>
             <div className="grid grid-cols-2 gap-6">
               {takeMeHomeData.rewardToGo.slice(0, visibleRewardToGo).map((product, index) => (
-                <ProductCard key={`promo-${index}`} {...product} onAddToCart={onAddToCart} />
+                <ProductCard key={`promo-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
               ))}
             </div>
             {visibleRewardToGo < takeMeHomeData.rewardToGo.length && (
@@ -301,7 +302,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart }) => {
             <h3 className="text-3xl font-bold font-serif text-brand-green mb-8 text-center">Produk Herbal</h3>
             <div className="grid grid-cols-2 gap-6">
               {takeMeHomeData.produkHerbal.slice(0, visibleHerbal).map((product, index) => (
-                <ProductCard key={`herbal-${index}`} {...product} onAddToCart={onAddToCart} />
+                <ProductCard key={`herbal-${index}`} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
               ))}
             </div>
             {visibleHerbal < takeMeHomeData.produkHerbal.length && (

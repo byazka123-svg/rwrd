@@ -11,14 +11,29 @@ interface Product {
   
 interface MenuItemCardProps extends Product {
   onAddToCart?: (item: Product) => void;
+  onCardClick?: (item: Product) => void;
 }
 
-const MenuItemCard: React.FC<MenuItemCardProps> = ({ name, description, image, price, packages, onAddToCart }) => {
+const MenuItemCard: React.FC<MenuItemCardProps> = ({ name, description, image, price, packages, onAddToCart, onCardClick }) => {
   const hasPackages = packages && Object.keys(packages).length > 0;
   const displayPrice = hasPackages ? `Mulai dari ${Object.values(packages)[0]}` : price;
+  const productData = { name, description, image, price, packages };
+
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart(productData);
+    }
+  };
   
   return (
-    <div className="bg-brand-offwhite rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+    <div 
+      className="bg-brand-offwhite rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 flex flex-col cursor-pointer"
+      onClick={() => onCardClick?.(productData)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(productData)}
+    >
       <img src={image} alt={name} className="w-full aspect-square object-cover" />
       <div className="p-4 flex flex-col flex-grow">
         <h4 className="text-base font-bold text-brand-green font-serif">{name}</h4>
@@ -28,7 +43,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ name, description, image, p
             <p className="text-base font-bold text-brand-green">{displayPrice}</p>
             {onAddToCart && (
                 <button 
-                onClick={() => onAddToCart({ name, description, image, price, packages })}
+                onClick={handleAddToCartClick}
                 className="bg-brand-orange text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-opacity-90 transition-transform transform hover:scale-110 shadow-md"
                 aria-label={`Add ${name} to cart`}
                 >

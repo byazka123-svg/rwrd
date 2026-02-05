@@ -51,9 +51,10 @@ interface Product {
 
 interface ProductsPageProps {
     onAddToCart: (item: Product) => void;
+    onViewDetails: (item: Product) => void;
 }
 
-const ProductsPage: React.FC<ProductsPageProps> = ({ onAddToCart }) => {
+const ProductsPage: React.FC<ProductsPageProps> = ({ onAddToCart, onViewDetails }) => {
   const [activeMainTab, setActiveMainTab] = useState<MainTab>('merchandise');
   const [activeMerchSubTab, setActiveMerchSubTab] = useState<MerchSubTab>('drinkware');
   
@@ -116,7 +117,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onAddToCart }) => {
 
           <div className="grid grid-cols-2 gap-6">
             {currentItems.map((product, index) => (
-              <ProductCard key={index} {...product} onAddToCart={onAddToCart} />
+              <ProductCard key={index} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
             ))}
           </div>
         </div>

@@ -78,7 +78,7 @@ const ReDrinkPage: React.FC<ReDrinkPageProps> = ({ onAddToCart }) => {
               <SectionTitle title="Our Full Re'drink Selection" subtitle="Signature Health Drinks" />
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {fullJsrData.map((item, index) => (
-                  <MenuItemCard key={index} {...item} onAddToCart={handleOpenModal} />
+                  <MenuItemCard key={index} {...item} onAddToCart={handleOpenModal} onCardClick={handleOpenModal} />
               ))}
               </div>
           </div>

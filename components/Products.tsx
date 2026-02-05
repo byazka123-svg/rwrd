@@ -49,9 +49,10 @@ interface Product {
 
 interface ProductsProps {
     onAddToCart: (item: Product) => void;
+    onViewDetails: (item: Product) => void;
 }
 
-const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
+const Products: React.FC<ProductsProps> = ({ onAddToCart, onViewDetails }) => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('rewardToGo');
   
   const subTabs: { id: SubTab, label: string }[] = [
@@ -100,7 +101,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
             {displayedItems.map((product, index) => (
-                <ProductCard key={index} {...product} onAddToCart={onAddToCart} />
+                <ProductCard key={index} {...product} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
             ))}
             </div>
             

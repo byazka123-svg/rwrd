@@ -18,6 +18,7 @@ import CartPopup from './components/CartPopup';
 import BottomNav from './components/BottomNav';
 import CheckoutForm from './components/CheckoutForm';
 import OrderSuccessNotification from './components/OrderSuccessNotification';
+import ProductDetailModal from './components/ProductDetailModal';
 
 // Define product and cart item types
 export interface Product {
@@ -39,13 +40,13 @@ export interface CustomerInfo {
     whatsapp: string;
 }
 
-const HomePage: React.FC<{ onAddToCart: (item: Product) => void }> = ({ onAddToCart }) => (
+const HomePage: React.FC<{ onAddToCart: (item: Product) => void; onViewDetails: (item: Product) => void; }> = ({ onAddToCart, onViewDetails }) => (
   <main>
     <Hero />
     <About />
-    <Menu onAddToCart={onAddToCart} />
+    <Menu onAddToCart={onAddToCart} onViewDetails={onViewDetails} />
     <JsrDrinks onAddToCart={onAddToCart} />
-    <Products onAddToCart={onAddToCart} />
+    <Products onAddToCart={onAddToCart} onViewDetails={onViewDetails} />
     <Services />
     <Gallery />
     <Contact />
@@ -59,6 +60,8 @@ const App: React.FC = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrderSent, setIsOrderSent] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedProductForDetail, setSelectedProductForDetail] = useState<Product | null>(null);
 
 
   const handleAddToCart = (itemToAdd: Product) => {
@@ -102,6 +105,16 @@ const App: React.FC = () => {
     setCustomerInfo(formData);
     setIsCheckoutOpen(false);
     setIsOrderSent(true);
+  };
+
+  const handleViewDetails = (product: Product) => {
+    setSelectedProductForDetail(product);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+      setIsDetailModalOpen(false);
+      setTimeout(() => setSelectedProductForDetail(null), 300); 
   };
 
   const handleWhatsAppConfirm = () => {
@@ -178,16 +191,16 @@ Mohon informasikan total beserta ongkos kirim. Terima kasih.
   const renderPage = () => {
     switch (route) {
       case '#fnb-menu':
-        return <MenuPage />;
+        return <MenuPage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
       case '#full-products':
-        return <ProductsPage onAddToCart={handleAddToCart} />;
+        return <ProductsPage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
       case '#full-redrink':
         return <ReDrinkPage onAddToCart={handleAddToCart} />;
       case '#store':
-        return <StorePage onAddToCart={handleAddToCart} />;
+        return <StorePage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
       default:
         // Handles #, #home, #about, etc. by showing the homepage
-        return <HomePage onAddToCart={handleAddToCart} />;
+        return <HomePage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
     }
   };
 
@@ -211,6 +224,12 @@ Mohon informasikan total beserta ongkos kirim. Terima kasih.
       <OrderSuccessNotification
         isOpen={isOrderSent}
         onConfirm={handleWhatsAppConfirm}
+      />
+      <ProductDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetails}
+        product={selectedProductForDetail}
+        onAddToCart={handleAddToCart}
       />
       <BottomNav
         cartItemCount={totalCartItems}

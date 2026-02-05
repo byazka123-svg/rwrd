@@ -22,16 +22,35 @@ const menuSlides = [
     }
 ];
 
-
 const menuData = {
-    minuman: [
-      { name: 'Purple Spark', description: 'A vibrant mix of butterfly pea flower, lemon, and soda for a magical fizz.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 42.000' },
-      { name: 'Apple Mind', description: 'Crisp apple juice infused with mint and a hint of ginger to sharpen your focus.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' },
-      { name: 'Citrus Lift', description: 'Uplifting blend of orange, lime, and turmeric for a zesty energy boost.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 40.000' },
-      { name: 'Matcha Rempah Latte', description: 'Earthy matcha combined with warming spices like cinnamon and cardamom.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 48.000' },
-      { name: 'Berry Calm Fizz', description: 'A calming concoction of mixed berries and chamomile, lightly carbonated.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' },
-      { name: 'Coconut Spice Cooler', description: 'Creamy coconut water with a hint of nutmeg and star anise, served chilled.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 47.000' }
-    ],
+    minuman: {
+      signatureSeries: [
+          { name: 'Matcha Rempah Latte', description: 'Earthy matcha combined with warming spices like cinnamon and cardamom.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 48.000' },
+          { name: 'Kopi Rempah Nusantara', description: 'Rich arabica coffee infused with traditional Indonesian spices for a bold, aromatic experience.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' }
+      ],
+      healingSeries: [
+          { name: 'Citrus Lift', description: 'Uplifting blend of orange, lime, and turmeric for a zesty energy boost.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 40.000' },
+          { name: 'Golden Turmeric Elixir', description: 'A soothing and anti-inflammatory blend of fresh turmeric, ginger, and black pepper.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 42.000' }
+      ],
+      womenWellness: [
+          { name: 'Rose Petal Infusion', description: 'A delicate and calming tea made with dried rose petals, known to aid menstrual comfort.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 38.000' },
+          { name: 'Feminine Balance Tea', description: 'A herbal blend designed to support hormonal balance and overall feminine health.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 40.000' }
+      ],
+      menWellness: [
+          { name: 'Stamina Booster Brew', description: 'A powerful concoction of red ginger, ginseng, and pasak bumi to enhance vitality.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' },
+          { name: 'Ginger Power Shot', description: 'A concentrated shot of ginger and galangal to invigorate the body and mind.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 35.000' }
+      ],
+      refreshSeries: [
+          { name: 'Purple Spark', description: 'A vibrant mix of butterfly pea flower, lemon, and soda for a magical fizz.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 42.000' },
+          { name: 'Apple Mind', description: 'Crisp apple juice infused with mint and a hint of ginger to sharpen your focus.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' },
+          { name: 'Berry Calm Fizz', description: 'A calming concoction of mixed berries and chamomile, lightly carbonated.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 45.000' },
+          { name: 'Coconut Spice Cooler', description: 'Creamy coconut water with a hint of nutmeg and star anise, served chilled.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 47.000' }
+      ],
+      selfRewardSpecials: [
+          { name: 'Chocolate Avocado Mousse Shake', description: 'A decadent and creamy shake made with avocado, raw cacao, and a touch of honey.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 55.000' },
+          { name: 'Creamy Cashew & Date Smoothie', description: 'A naturally sweet smoothie that feels like a dessert but is packed with nutrients.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(11).jpg', price: 'Rp 52.000' }
+      ]
+    },
     makanan: [
       { name: 'Mie Goreng Habbats', description: 'Stir-fried noodles with habbatussauda, fresh vegetables, and your choice of protein.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(12).jpg', price: 'Rp 65.000' },
       { name: 'Mie Kuah', description: 'Hearty noodle soup with a rich herbal broth, mushrooms, and leafy greens.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(12).jpg', price: 'Rp 65.000' },
@@ -48,18 +67,43 @@ const menuData = {
       { name: 'Kurma Ball', description: 'Energy balls made from dates, nuts, and coconut. Naturally sweet and satisfying.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(13).jpg', price: 'Rp 30.000' }
     ]
   };
-type SubTab = keyof typeof menuData;
+type SubTab = 'minuman' | 'makanan' | 'dessert';
+type MinumanSubTab = keyof typeof menuData.minuman;
 
-const MenuPage: React.FC = () => {
+interface Product {
+    name: string;
+    description: string;
+    image: string;
+    price?: string;
+}
+
+interface MenuPageProps {
+    onAddToCart: (item: Product) => void;
+    onViewDetails: (item: Product) => void;
+}
+
+const MenuPage: React.FC<MenuPageProps> = ({ onAddToCart, onViewDetails }) => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('minuman');
+  const [activeMinumanSubTab, setActiveMinumanSubTab] = useState<MinumanSubTab>('signatureSeries');
   
   const subTabs: { id: SubTab, label: string }[] = [
     { id: 'minuman', label: 'Minuman' },
     { id: 'makanan', label: 'Makanan' },
     { id: 'dessert', label: 'Dessert/Snack' },
   ];
+
+  const minumanSubTabs: { id: MinumanSubTab, label: string }[] = [
+    { id: 'signatureSeries', label: 'Signature Series' },
+    { id: 'healingSeries', label: 'Healing Series' },
+    { id: 'womenWellness', label: 'Women Wellness' },
+    { id: 'menWellness', label: 'Men Wellness' },
+    { id: 'refreshSeries', label: 'Re’fresh Series' },
+    { id: 'selfRewardSpecials', label: 'Self Reward Specials' },
+  ];
   
-  const currentItems = menuData[activeSubTab];
+  const currentItems = activeSubTab === 'minuman'
+    ? menuData.minuman[activeMinumanSubTab]
+    : menuData[activeSubTab];
 
   return (
     <main>
@@ -82,9 +126,26 @@ const MenuPage: React.FC = () => {
                 </button>
             ))}
             </div>
+            {activeSubTab === 'minuman' && (
+              <div className="flex overflow-x-auto gap-2 mb-10 hide-scrollbar pb-4 -mx-6 px-6">
+                  {minumanSubTabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveMinumanSubTab(tab.id)}
+                        className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                        activeMinumanSubTab === tab.id
+                            ? 'bg-brand-green text-white shadow'
+                            : 'bg-white text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                  ))}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-6">
             {currentItems.map((item, index) => (
-                <MenuItemCard key={index} {...item} />
+                <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
             ))}
             </div>
         </div>

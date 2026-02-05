@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -16,6 +17,14 @@
       }
       .animate-fade-in {
         animation: fade-in 0.3s ease-out forwards;
+      }
+      /* Hide scrollbar for elements with this class */
+      .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
       }
     </style>
      <script>
