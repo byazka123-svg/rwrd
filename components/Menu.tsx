@@ -59,11 +59,10 @@ interface Product {
 }
   
 interface MenuProps {
-    onAddToCart: (item: Product) => void;
     onViewDetails: (item: Product) => void;
 }
 
-const Menu: React.FC<MenuProps> = ({ onAddToCart, onViewDetails }) => {
+const Menu: React.FC<MenuProps> = ({ onViewDetails }) => {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('minuman');
   
   const subTabs: { id: SubTab, label: string }[] = [
@@ -110,7 +109,7 @@ const Menu: React.FC<MenuProps> = ({ onAddToCart, onViewDetails }) => {
           </div>
           <div className="grid grid-cols-2 gap-4 pt-8">
             {displayedItems.map((item, index) => (
-              <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
+              <MenuItemCard key={index} {...item} onCardClick={onViewDetails} />
             ))}
           </div>
           

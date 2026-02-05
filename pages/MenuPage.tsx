@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MenuItemCard from '../components/MenuItemCard';
 import SectionTitle from '../components/SectionTitle';
 import Slider from '../components/Slider';
@@ -66,9 +66,9 @@ const menuData = {
       { name: 'Chicken Mushroom Pizza', description: 'Personal pizza on a thin cauliflower crust with a light tomato sauce.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(13).jpg', price: 'Rp 68.000' },
       { name: 'Kurma Ball', description: 'Energy balls made from dates, nuts, and coconut. Naturally sweet and satisfying.', image: 'https://ik.imagekit.io/hrctvvb3m/unnamed%20(13).jpg', price: 'Rp 30.000' }
     ]
-  };
-type SubTab = 'minuman' | 'makanan' | 'dessert';
-type MinumanSubTab = keyof typeof menuData.minuman;
+};
+
+const formatSubCategoryLabel = (key: string) => key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 
 interface Product {
     name: string;
@@ -78,80 +78,156 @@ interface Product {
 }
 
 interface MenuPageProps {
-    onAddToCart: (item: Product) => void;
     onViewDetails: (item: Product) => void;
 }
 
-const MenuPage: React.FC<MenuPageProps> = ({ onAddToCart, onViewDetails }) => {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('minuman');
-  const [activeMinumanSubTab, setActiveMinumanSubTab] = useState<MinumanSubTab>('signatureSeries');
-  
-  const subTabs: { id: SubTab, label: string }[] = [
-    { id: 'minuman', label: 'Minuman' },
-    { id: 'makanan', label: 'Makanan' },
-    { id: 'dessert', label: 'Dessert/Snack' },
-  ];
+const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
+  const [activeCategory, setActiveCategory] = useState<string>('minuman');
+  const [activeMinumanSubTab, setActiveMinumanSubTab] = useState<string>('signatureSeries');
 
-  const minumanSubTabs: { id: MinumanSubTab, label: string }[] = [
-    { id: 'signatureSeries', label: 'Signature Series' },
-    { id: 'healingSeries', label: 'Healing Series' },
-    { id: 'womenWellness', label: 'Women Wellness' },
-    { id: 'menWellness', label: 'Men Wellness' },
-    { id: 'refreshSeries', label: 'Re’fresh Series' },
-    { id: 'selfRewardSpecials', label: 'Self Reward Specials' },
-  ];
-  
-  const currentItems = activeSubTab === 'minuman'
-    ? menuData.minuman[activeMinumanSubTab]
-    : menuData[activeSubTab];
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const subCategoryLinkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
+
+  // Effect for scrollspy
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            const [type, category, subCategory] = id.split('-');
+            
+            if (type === 'category') {
+               setActiveCategory(category);
+            } else if (type === 'subcategory') {
+               setActiveCategory(category);
+               setActiveMinumanSubTab(subCategory);
+            }
+          }
+        });
+      },
+      {
+        rootMargin: `-180px 0px -65% 0px`,
+        threshold: 0,
+      }
+    );
+
+    // FIX: Changed from Object.values to Object.keys to iterate over the refs.
+    // This resolves a TypeScript error where the ref was incorrectly inferred as 'unknown',
+    // making it unassignable to the 'Element' parameter of 'observer.observe'.
+    const currentRefs = sectionRefs.current;
+    Object.keys(currentRefs).forEach((key) => {
+      const ref = currentRefs[key];
+      if (ref) {
+        observer.observe(ref);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Effect for auto-scrolling sub-category navigation
+  useEffect(() => {
+    const activeLink = subCategoryLinkRefs.current[activeMinumanSubTab];
+    if (activeLink) {
+        activeLink.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+        });
+    }
+  }, [activeMinumanSubTab]);
+
+  const subTabs = Object.keys(menuData).map(key => ({
+    id: key,
+    label: key.charAt(0).toUpperCase() + key.slice(1)
+  }));
+
+  const minumanSubTabs = Object.keys(menuData.minuman).map(key => ({
+    id: key,
+    label: formatSubCategoryLabel(key)
+  }));
 
   return (
     <main>
-        <Slider slides={menuSlides} />
-        <section id="full-menu" className="py-12 bg-white">
-        <div className="container mx-auto px-6">
-            <SectionTitle title="Our Full Menu" subtitle="Taste The Goodness" />
-            <div className="sticky top-20 z-30 bg-white pt-4 pb-2 -mx-6 px-6 shadow-sm">
-              <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto">
-                {subTabs.map(tab => (
-                    <button
+      <Slider slides={menuSlides} />
+      
+      <div className="sticky top-20 z-30 bg-white shadow-md">
+        <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto bg-white">
+          {subTabs.map(tab => (
+            <a
+              href={`#category-${tab.id}`}
+              key={tab.id}
+              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+                activeCategory === tab.id
+                  ? 'text-brand-orange border-b-2 border-brand-orange'
+                  : 'text-brand-brown hover:text-brand-orange'
+              }`}
+            >
+              {tab.label}
+            </a>
+          ))}
+        </div>
+        
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${activeCategory === 'minuman' ? 'max-h-40' : 'max-h-0'}`}>
+            <div className="flex overflow-x-auto gap-2 p-3 hide-scrollbar bg-white/95 backdrop-blur-sm">
+                {minumanSubTabs.map(tab => (
+                  <a
+                    href={`#subcategory-minuman-${tab.id}`}
                     key={tab.id}
-                    onClick={() => setActiveSubTab(tab.id)}
-                    className={`px-5 py-2 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
-                        activeSubTab === tab.id
-                        ? 'text-brand-orange border-b-2 border-brand-orange'
-                        : 'text-brand-brown hover:text-brand-orange'
+                    ref={el => subCategoryLinkRefs.current[tab.id] = el}
+                    className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                    activeMinumanSubTab === tab.id
+                      ? 'bg-brand-green text-white shadow'
+                      : 'bg-brand-offwhite text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
                     }`}
-                    >
+                  >
                     {tab.label}
-                    </button>
+                  </a>
                 ))}
-              </div>
-              {activeSubTab === 'minuman' && (
-                <div className="flex overflow-x-auto gap-2 mt-4 hide-scrollbar pb-2">
-                    {minumanSubTabs.map(tab => (
-                      <button
-                          key={tab.id}
-                          onClick={() => setActiveMinumanSubTab(tab.id)}
-                          className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
-                          activeMinumanSubTab === tab.id
-                              ? 'bg-brand-green text-white shadow'
-                              : 'bg-white text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
-                          }`}
-                      >
-                          {tab.label}
-                      </button>
-                    ))}
-                </div>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-6 pt-10">
-              {currentItems.map((item, index) => (
-                  <MenuItemCard key={index} {...item} onAddToCart={onAddToCart} onCardClick={onViewDetails} />
-              ))}
             </div>
         </div>
-        </section>
+      </div>
+      
+      <section id="full-menu-content" className="bg-white">
+        <div className="container mx-auto px-6">
+          <div id="category-minuman" ref={el => sectionRefs.current['category-minuman'] = el} className="pt-8">
+            <SectionTitle title="Minuman" subtitle="Our Beverages" />
+            {Object.entries(menuData.minuman).map(([subCategory, items]) => (
+              <div key={subCategory} id={`subcategory-minuman-${subCategory}`} ref={el => sectionRefs.current[`subcategory-minuman-${subCategory}`] = el} className="mb-12">
+                <h3 className="text-2xl font-bold font-serif text-brand-green mb-6 border-l-4 border-brand-orange pl-4">
+                  {formatSubCategoryLabel(subCategory)}
+                </h3>
+                <div className="grid grid-cols-2 gap-6">
+                  {items.map((item, index) => (
+                    <MenuItemCard key={`${subCategory}-${index}`} {...item} onCardClick={onViewDetails} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div id="category-makanan" ref={el => sectionRefs.current['category-makanan'] = el} className="pt-8">
+            <SectionTitle title="Makanan" subtitle="Main Courses" />
+            <div className="grid grid-cols-2 gap-6">
+              {menuData.makanan.map((item, index) => (
+                <MenuItemCard key={`makanan-${index}`} {...item} onCardClick={onViewDetails} />
+              ))}
+            </div>
+          </div>
+          
+          <div id="category-dessert" ref={el => sectionRefs.current['category-dessert'] = el} className="pt-16 pb-12">
+            <SectionTitle title="Dessert & Snack" subtitle="Sweet & Savory" />
+            <div className="grid grid-cols-2 gap-6">
+              {menuData.dessert.map((item, index) => (
+                <MenuItemCard key={`dessert-${index}`} {...item} onCardClick={onViewDetails} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 };

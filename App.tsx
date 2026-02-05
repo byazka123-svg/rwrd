@@ -40,13 +40,16 @@ export interface CustomerInfo {
     whatsapp: string;
 }
 
-const HomePage: React.FC<{ onAddToCart: (item: Product) => void; onViewDetails: (item: Product) => void; }> = ({ onAddToCart, onViewDetails }) => (
+const HomePage: React.FC<{ 
+    onAddToCart: (item: Product) => void; 
+    onViewDetails: (product: Product, canAddToCart: boolean) => void; 
+}> = ({ onAddToCart, onViewDetails }) => (
   <main>
     <Hero />
     <About />
-    <Menu onAddToCart={onAddToCart} onViewDetails={onViewDetails} />
+    <Menu onViewDetails={(p) => onViewDetails(p, false)} />
     <JsrDrinks onAddToCart={onAddToCart} />
-    <Products onAddToCart={onAddToCart} onViewDetails={onViewDetails} />
+    <Products onAddToCart={onAddToCart} onViewDetails={(p) => onViewDetails(p, true)} />
     <Services />
     <Gallery />
     <Contact />
@@ -62,6 +65,7 @@ const App: React.FC = () => {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedProductForDetail, setSelectedProductForDetail] = useState<Product | null>(null);
+  const [isModalAddToCartEnabled, setIsModalAddToCartEnabled] = useState(false);
 
 
   const handleAddToCart = (itemToAdd: Product) => {
@@ -107,8 +111,9 @@ const App: React.FC = () => {
     setIsOrderSent(true);
   };
 
-  const handleViewDetails = (product: Product) => {
+  const handleViewDetails = (product: Product, canAddToCart: boolean) => {
     setSelectedProductForDetail(product);
+    setIsModalAddToCartEnabled(canAddToCart);
     setIsDetailModalOpen(true);
   };
 
@@ -191,13 +196,13 @@ Mohon informasikan total beserta ongkos kirim. Terima kasih.
   const renderPage = () => {
     switch (route) {
       case '#fnb-menu':
-        return <MenuPage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
+        return <MenuPage onViewDetails={(p) => handleViewDetails(p, false)} />;
       case '#full-products':
-        return <ProductsPage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
+        return <ProductsPage onAddToCart={handleAddToCart} onViewDetails={(p) => handleViewDetails(p, true)} />;
       case '#full-redrink':
         return <ReDrinkPage onAddToCart={handleAddToCart} />;
       case '#store':
-        return <StorePage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
+        return <StorePage onAddToCart={handleAddToCart} onViewDetails={(p) => handleViewDetails(p, true)} />;
       default:
         // Handles #, #home, #about, etc. by showing the homepage
         return <HomePage onAddToCart={handleAddToCart} onViewDetails={handleViewDetails} />;
@@ -229,7 +234,7 @@ Mohon informasikan total beserta ongkos kirim. Terima kasih.
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetails}
         product={selectedProductForDetail}
-        onAddToCart={handleAddToCart}
+        onAddToCart={isModalAddToCartEnabled ? handleAddToCart : undefined}
       />
       <BottomNav
         cartItemCount={totalCartItems}

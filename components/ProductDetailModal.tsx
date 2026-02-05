@@ -14,15 +14,17 @@ interface ProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
-  onAddToCart: (item: Product) => void;
+  onAddToCart?: (item: Product) => void;
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart }) => {
   if (!isOpen || !product) return null;
 
   const handleAddToCartClick = () => {
-    onAddToCart(product);
-    onClose(); // Close modal after adding to cart
+    if (product && onAddToCart) {
+      onAddToCart(product);
+      onClose(); // Close modal after adding to cart
+    }
   };
 
   return (
@@ -54,14 +56,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
             <p className="text-brand-brown mt-4 text-sm leading-relaxed">{product.description}</p>
         </div>
 
-        <div className="mt-8">
-          <button
-            onClick={handleAddToCartClick}
-            className="w-full text-center bg-brand-green text-brand-offwhite font-bold py-3 px-6 rounded-full hover:bg-opacity-90 transition-transform transform hover:scale-105 shadow-lg"
-          >
-            Tambahkan ke Keranjang
-          </button>
-        </div>
+        {onAddToCart && (
+            <div className="mt-8">
+            <button
+                onClick={handleAddToCartClick}
+                className="w-full text-center bg-brand-green text-brand-offwhite font-bold py-3 px-6 rounded-full hover:bg-opacity-90 transition-transform transform hover:scale-105 shadow-lg"
+            >
+                Tambahkan ke Keranjang
+            </button>
+            </div>
+        )}
       </div>
     </div>
   );
