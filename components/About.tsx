@@ -1,23 +1,27 @@
 
 import React from 'react';
-import SectionTitle from './SectionTitle';
 
 const About: React.FC = () => {
   return (
-    <section id="about" className="py-20 bg-brand-offwhite">
-      <div className="container mx-auto px-6">
-        <SectionTitle title="Our Philosophy" subtitle="Welcome to Re'ward" />
-        <div className="flex flex-col items-center gap-12">
-          <div>
-            <img 
-              src="https://ik.imagekit.io/hrctvvb3m/Gemini_Generated_Image_9nun1l9nun1l9nun.png" 
-              alt="Cozy cafe interior with natural light" 
-              className="rounded-lg shadow-2xl w-full h-auto object-cover"
-            />
-          </div>
-          <div className="text-lg text-brand-brown leading-relaxed">
+    <section 
+      id="about" 
+      className="relative py-20 md:py-32 bg-cover bg-center bg-fixed" 
+      style={{ backgroundImage: "url('https://ik.imagekit.io/hrctvvb3m/Untitled%20design%20(12).png')" }}
+    >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-brand-green bg-opacity-75"></div>
+
+      <div className="relative z-10 container mx-auto px-6">
+        {/* Custom SectionTitle for inverted colors */}
+        <div className="text-center mb-12">
+          <h3 className="text-base text-brand-orange font-bold tracking-wider uppercase">Welcome to Re'ward</h3>
+          <h2 className="text-4xl md:text-5xl font-bold font-serif text-brand-offwhite mt-2" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>Our Philosophy</h2>
+        </div>
+        
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="text-lg text-brand-offwhite leading-relaxed" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>
             <p className="mb-4">
-              Di <span className="font-bold text-brand-green">Re'ward by Dr. Zaidul Akbar</span>, kami membangun brand di atas fondasi Thibbun Nabawi (Kesehatan Islam) yang ilmiah, memadukan kearifan lokal dengan ilmu kedokteran modern.
+              Di <span className="font-bold">Re'ward by Dr. Zaidul Akbar</span>, kami membangun brand di atas fondasi Thibbun Nabawi (Kesehatan Islam) yang ilmiah, memadukan kearifan lokal dengan ilmu kedokteran modern.
             </p>
             <p className="mb-4">
                Kami percaya <span className="font-semibold text-brand-orange">self-reward</span> sejati bukanlah kemewahan sesaat, melainkan bentuk kasih sayang pada tubuh (self-love). Kami hadir untuk menjadi jeda dan apresiasi di tengah rutinitas Anda yang padat.
