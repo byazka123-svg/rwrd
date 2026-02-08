@@ -16,7 +16,7 @@ const menuSlides = [
         subtitle: "Experience our signature herbal infusions and lattes, designed to soothe and rejuvenate."
     },
     {
-        url: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1974&auto=format&fit=crop',
+        url: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1974&auto-format&fit=crop',
         title: "Guilt-Free Indulgence",
         subtitle: "Treat yourself to our delightful desserts, made with natural sweeteners and wholesome ingredients."
     }
@@ -88,16 +88,20 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const subCategoryLinkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isClickScrolling = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
+
 
   // Effect for scrollspy
   useEffect(() => {
-    // We disconnect the observer on re-renders to avoid observing stale elements
     if (observerRef.current) {
         observerRef.current.disconnect();
     }
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
+        if (isClickScrolling.current) return;
+
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.id;
@@ -113,7 +117,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
         });
       },
       {
-        rootMargin: `-180px 0px -65% 0px`,
+        rootMargin: `-200px 0px -50% 0px`,
         threshold: 0,
       }
     );
@@ -128,8 +132,11 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
 
     return () => {
         observerRef.current?.disconnect();
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+        }
     };
-  }, []); // Rerunning this effect isn't necessary on state changes
+  }, []);
 
   // Effect for auto-scrolling sub-category navigation
   useEffect(() => {
@@ -145,26 +152,53 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
   
   const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, categoryId: string) => {
     e.preventDefault();
+    isClickScrolling.current = true;
     setActiveCategory(categoryId);
-    const element = document.getElementById(`category-${categoryId}`);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+
+    const targetElement = document.getElementById(`category-${categoryId}`);
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
     }
+
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = window.setTimeout(() => {
+        isClickScrolling.current = false;
+    }, 1000);
   };
 
   const handleSubCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, subCategoryId: string) => {
       e.preventDefault();
+      isClickScrolling.current = true;
       setActiveMinumanSubTab(subCategoryId);
-      const element = document.getElementById(`subcategory-minuman-${subCategoryId}`);
-      if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+
+      const targetElement = document.getElementById(`subcategory-minuman-${subCategoryId}`);
+      if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
       }
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isClickScrolling.current = false;
+      }, 1000);
   };
 
-  const subTabs = Object.keys(menuData).map(key => ({
-    id: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1)
-  }));
+  const subTabs = [
+    { 
+      id: 'minuman', 
+      label: 'Minuman', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+    },
+    { 
+      id: 'makanan', 
+      label: 'Makanan', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h16" /></svg>
+    },
+    { 
+      id: 'dessert', 
+      label: 'Dessert', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>
+    }
+  ];
 
   const minumanSubTabs = Object.keys(menuData.minuman).map(key => ({
     id: key,
@@ -176,19 +210,20 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
       <Slider slides={menuSlides} />
       
       <div className="sticky top-20 z-30 bg-white shadow-md">
-        <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto bg-white">
+        <div className="flex justify-center border-b border-brand-orange/30 bg-white">
           {subTabs.map(tab => (
             <a
               href={`#category-${tab.id}`}
               key={tab.id}
-              onClick={(e) => handleCategoryClick(e, tab.id)}
-              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+              onMouseDown={(e) => handleCategoryClick(e, tab.id)}
+              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 flex items-center justify-center ${
                 activeCategory === tab.id
                   ? 'text-brand-orange border-b-2 border-brand-orange'
                   : 'text-brand-brown hover:text-brand-orange'
               }`}
             >
-              {tab.label}
+              {tab.icon}
+              <span>{tab.label}</span>
             </a>
           ))}
         </div>
@@ -200,8 +235,8 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
                     href={`#subcategory-minuman-${tab.id}`}
                     key={tab.id}
                     ref={el => subCategoryLinkRefs.current[tab.id] = el}
-                    onClick={(e) => handleSubCategoryClick(e, tab.id)}
-                    className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                    onMouseDown={(e) => handleSubCategoryClick(e, tab.id)}
+                    className={`flex-shrink-0 px-5 py-3 text-sm font-semibold rounded-full transition-colors duration-300 ${
                     activeMinumanSubTab === tab.id
                       ? 'bg-brand-green text-white shadow'
                       : 'bg-brand-offwhite text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
@@ -216,7 +251,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
       
       <section id="full-menu-content" className="bg-white">
         <div className="container mx-auto px-6">
-          <div id="category-minuman" ref={el => sectionRefs.current['category-minuman'] = el} className="pt-8">
+          <div id="category-minuman" ref={el => sectionRefs.current['category-minuman'] = el} className="pt-16">
             <SectionTitle title="Minuman" subtitle="Our Beverages" />
             {Object.entries(menuData.minuman).map(([subCategory, items]) => (
               <div key={subCategory} id={`subcategory-minuman-${subCategory}`} ref={el => sectionRefs.current[`subcategory-minuman-${subCategory}`] = el} className="mb-12">
@@ -232,7 +267,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
             ))}
           </div>
 
-          <div id="category-makanan" ref={el => sectionRefs.current['category-makanan'] = el} className="pt-8">
+          <div id="category-makanan" ref={el => sectionRefs.current['category-makanan'] = el} className="pt-16">
             <SectionTitle title="Makanan" subtitle="Main Courses" />
             <div className="grid grid-cols-2 gap-6">
               {menuData.makanan.map((item, index) => (

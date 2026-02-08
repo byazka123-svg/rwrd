@@ -119,12 +119,30 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const subCategoryLinkRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isClickScrolling = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
   const mainTabs = [
-    { id: 'redrink', label: "Re'drink" },
-    { id: 'merchandise', label: 'Merchandise' },
-    { id: 'rewardToGo', label: "Re'ward To Go" },
-    { id: 'produkHerbal', label: 'Produk Herbal' },
+    { 
+      id: 'redrink', 
+      label: "Re'drink", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+    },
+    { 
+      id: 'merchandise', 
+      label: 'Merchandise', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+    },
+    { 
+      id: 'rewardToGo', 
+      label: "Re'ward To Go", 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+    },
+    { 
+      id: 'produkHerbal', 
+      label: 'Produk Herbal', 
+      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c1.355 0 2.707-.157 4-.452M12 21c-1.355 0-2.707-.157-4-.452M3 15a9.004 9.004 0 0018 0" /></svg>
+    },
   ];
 
   const merchSubTabs = Object.keys(takeMeHomeData.merchandise).map(key => ({
@@ -137,6 +155,8 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
+        if (isClickScrolling.current) return;
+        
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.id;
@@ -151,7 +171,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
           }
         });
       },
-      { rootMargin: `-180px 0px -65% 0px`, threshold: 0 }
+      { rootMargin: `-200px 0px -50% 0px`, threshold: 0 }
     );
 
     const currentRefs = sectionRefs.current;
@@ -160,7 +180,12 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
       if (ref) observerRef.current?.observe(ref);
     });
 
-    return () => observerRef.current?.disconnect();
+    return () => {
+        observerRef.current?.disconnect();
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+        }
+    };
   }, []);
 
   useEffect(() => {
@@ -188,20 +213,34 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
   
   const handleCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, categoryId: string) => {
     e.preventDefault();
+    isClickScrolling.current = true;
     setActiveCategory(categoryId);
-    const element = document.getElementById(`category-${categoryId}`);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+
+    const targetElement = document.getElementById(`category-${categoryId}`);
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
     }
+
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = window.setTimeout(() => {
+      isClickScrolling.current = false;
+    }, 1000);
   };
 
   const handleSubCategoryClick = (e: React.MouseEvent<HTMLAnchorElement>, subCategoryId: string) => {
       e.preventDefault();
+      isClickScrolling.current = true;
       setActiveMerchSubTab(subCategoryId);
-      const element = document.getElementById(`subcategory-merchandise-${subCategoryId}`);
-      if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+      
+      const targetElement = document.getElementById(`subcategory-merchandise-${subCategoryId}`);
+      if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
       }
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isClickScrolling.current = false;
+      }, 1000);
   };
 
   return (
@@ -215,19 +254,20 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
       />
       
       <div className="sticky top-20 z-30 bg-white shadow-md">
-        <div className="flex justify-center border-b border-brand-orange/30 overflow-x-auto bg-white">
+        <div className="flex flex-wrap justify-center border-b border-brand-orange/30 bg-white">
           {mainTabs.map(tab => (
             <a
               href={`#category-${tab.id}`}
               key={tab.id}
-              onClick={(e) => handleCategoryClick(e, tab.id)}
-              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 ${
+              onMouseDown={(e) => handleCategoryClick(e, tab.id)}
+              className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 flex items-center justify-center ${
                 activeCategory === tab.id
                   ? 'text-brand-orange border-b-2 border-brand-orange'
                   : 'text-brand-brown hover:text-brand-orange'
               }`}
             >
-              {tab.label}
+              {tab.icon}
+              <span>{tab.label}</span>
             </a>
           ))}
         </div>
@@ -239,8 +279,8 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
                     href={`#subcategory-merchandise-${tab.id}`}
                     key={tab.id}
                     ref={el => subCategoryLinkRefs.current[tab.id] = el}
-                    onClick={(e) => handleSubCategoryClick(e, tab.id)}
-                    className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${
+                    onMouseDown={(e) => handleSubCategoryClick(e, tab.id)}
+                    className={`flex-shrink-0 px-5 py-3 text-sm font-semibold rounded-full transition-colors duration-300 ${
                     activeMerchSubTab === tab.id
                       ? 'bg-brand-green text-white shadow'
                       : 'bg-brand-offwhite text-brand-brown hover:bg-brand-orange/20 border border-brand-orange/20 shadow-sm'
@@ -255,7 +295,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
 
       <section id="full-store-content" className="bg-white">
         <div className="container mx-auto px-6">
-          <div id="category-redrink" ref={el => sectionRefs.current['category-redrink'] = el} className="pt-8">
+          <div id="category-redrink" ref={el => sectionRefs.current['category-redrink'] = el} className="pt-16">
             <SectionTitle title="Re'drink" subtitle="Paket Sehat Harian" />
             <div className="grid grid-cols-2 gap-6">
               {fullJsrData.map((item, index) => (
@@ -280,7 +320,7 @@ const StorePage: React.FC<StorePageProps> = ({ onAddToCart, onViewDetails }) => 
             ))}
           </div>
           
-          <div id="category-rewardToGo" ref={el => sectionRefs.current['category-rewardToGo'] = el} className="pt-8">
+          <div id="category-rewardToGo" ref={el => sectionRefs.current['category-rewardToGo'] = el} className="pt-16">
             <SectionTitle title="Re'ward To Go" subtitle="Kebaikan Instan" />
             <div className="grid grid-cols-2 gap-6">
               {takeMeHomeData.rewardToGo.map((item, index) => (
