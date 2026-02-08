@@ -216,6 +216,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
               href={`#category-${tab.id}`}
               key={tab.id}
               onMouseDown={(e) => handleCategoryClick(e, tab.id)}
+              onClick={(e) => e.preventDefault()}
               className={`px-5 py-3 text-md font-medium transition-colors duration-300 flex-shrink-0 flex items-center justify-center ${
                 activeCategory === tab.id
                   ? 'text-brand-orange border-b-2 border-brand-orange'
@@ -236,6 +237,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ onViewDetails }) => {
                     key={tab.id}
                     ref={el => subCategoryLinkRefs.current[tab.id] = el}
                     onMouseDown={(e) => handleSubCategoryClick(e, tab.id)}
+                    onClick={(e) => e.preventDefault()}
                     className={`flex-shrink-0 px-5 py-3 text-sm font-semibold rounded-full transition-colors duration-300 ${
                     activeMinumanSubTab === tab.id
                       ? 'bg-brand-green text-white shadow'
